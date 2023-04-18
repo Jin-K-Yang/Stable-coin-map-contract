@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract NFTReward is ERC721, AccessControl {
+contract NFTReward is ERC721Burnable, AccessControl {
     using Strings for uint256;
     using Counters for Counters.Counter;
 
@@ -24,6 +24,15 @@ contract NFTReward is ERC721, AccessControl {
 
         _mint(to, _tokenIdTracker.current());
         _tokenIdTracker.increment();
+    }
+
+    function burn(uint256 tokenId) public override {
+        require(
+            _isApprovedOrOwner(_msgSender(), tokenId) ||
+                hasRole(DEFAULT_ADMIN_ROLE, _msgSender()),
+            "ERC721: caller is not token owner or approved or admin"
+        );
+        _burn(tokenId);
     }
 
     function setBaseURI(string memory _inputBaseURI) external {
