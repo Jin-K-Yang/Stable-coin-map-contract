@@ -19,17 +19,18 @@ contract NFTReward is ERC721Burnable, AccessControl {
         _grantRole(MINTER_ROLE, minter);
     }
 
-    function mint(address to) public {
+    function mint(address to) external returns (uint256 tokenId) {
         require(hasRole(MINTER_ROLE, _msgSender()), "You are not minter!");
 
         _mint(to, _tokenIdTracker.current());
         _tokenIdTracker.increment();
+
+        return _tokenIdTracker.current() - 1;
     }
 
     function burn(uint256 tokenId) public override {
         require(
-            _isApprovedOrOwner(_msgSender(), tokenId) ||
-                hasRole(DEFAULT_ADMIN_ROLE, _msgSender()),
+            _isApprovedOrOwner(_msgSender(), tokenId) || hasRole(DEFAULT_ADMIN_ROLE, _msgSender()),
             "ERC721: caller is not token owner or approved or admin"
         );
         _burn(tokenId);
@@ -43,9 +44,7 @@ contract NFTReward is ERC721Burnable, AccessControl {
         return _baseTokenURI;
     }
 
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override(AccessControl, ERC721) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view virtual override(AccessControl, ERC721) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 }
