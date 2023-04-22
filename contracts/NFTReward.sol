@@ -28,13 +28,13 @@ contract NFTReward is ERC721Burnable, AccessControl {
         return _tokenIdTracker.current() - 1;
     }
 
-    function burn(uint256 tokenId) public override {
-        require(
-            _isApprovedOrOwner(_msgSender(), tokenId) || hasRole(DEFAULT_ADMIN_ROLE, _msgSender()),
-            "ERC721: caller is not token owner or approved or admin"
-        );
-        _burn(tokenId);
-    }
+    // function burn(uint256 tokenId) public override {
+    //     require(
+    //         _isApprovedOrOwner(_msgSender(), tokenId) || hasRole(DEFAULT_ADMIN_ROLE, _msgSender()),
+    //         "ERC721: caller is not token owner or approved or admin"
+    //     );
+    //     _burn(tokenId);
+    // }
 
     function setBaseURI(string memory _inputBaseURI) external {
         _baseTokenURI = _inputBaseURI;

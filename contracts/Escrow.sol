@@ -17,7 +17,6 @@ contract Escrow is Ownable {
     address constant USDT_ADDRESS = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
 
     struct EscrowInfo {
-        uint256 NFTRewardId;
         uint256 escrowBlockNumber;
         bool approved;
         address escrowToken;
@@ -35,10 +34,6 @@ contract Escrow is Ownable {
         escrowPeriod = _escrowPeriod;
     }
 
-    function queryTokenId(address payee, uint256 depositTimes) public view returns (uint256) {
-        return _deposits[payee][depositTimes].NFTRewardId;
-    }
-
     function userEscrowAmount(address user) public view returns (uint256) {
         uint256 totalAmount = 0;
         for (uint256 i = 0; i < _deposits[user].length; i++) {
@@ -47,13 +42,21 @@ contract Escrow is Ownable {
         return totalAmount;
     }
 
+    function userNFTRewardId(address user, uint256 escrowTimes) public view returns (uint256) {
+        return userNFTId[user][escrowTimes];
+    }
+
+    function userEscrowTimes(address user) public view returns (uint256) {
+        return _deposits[user].length;
+    }
+
     // allow USDT and USDC
     function deposit(address depositTokenAddress) external {
         require(depositTokenAddress == USDC_ADDRESS || depositTokenAddress == USDT_ADDRESS, "deposit only allow USDT and USDC!");
 
         IERC20(depositTokenAddress).safeTransferFrom(_msgSender(), address(this), escrowAmount);
 
-        _deposits[_msgSender()].push(EscrowInfo(0, block.number, true, depositTokenAddress, escrowAmount));
+        _deposits[_msgSender()].push(EscrowInfo(block.number, true, depositTokenAddress, escrowAmount));
 
         emit Deposited(_msgSender(), block.number, depositTokenAddress, escrowAmount);
     }
